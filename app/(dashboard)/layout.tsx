@@ -1,4 +1,4 @@
-import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { createClient } from "@/lib/supabase/server";
 import type { ReactNode } from "react";
