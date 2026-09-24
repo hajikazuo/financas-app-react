@@ -2,6 +2,7 @@ import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/s
 import { AppSidebar } from "@/components/app-sidebar"
 import { createClient } from "@/lib/supabase/server";
 import type { ReactNode } from "react";
+import { PageHeader } from "@/components/page-header";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
     const supabase = await createClient();
@@ -12,9 +13,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             <AppSidebar email={user?.email} />
 
             <SidebarInset className="flex min-h-svh flex-1 flex-col">
-                <header className="flex h-16 items-center gap-4 border-b px-4 md:px-6">
-                    <SidebarTrigger />
-                </header>
+                <PageHeader />
                 <main className="flex-1 p-5 md:p-7">
                     {children}
                 </main>
