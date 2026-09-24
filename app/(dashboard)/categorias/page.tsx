@@ -1,15 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
-import { mapearCategoria, type CategoriaRow } from "@/types/categoria";
+import { GlobalToast } from "@/components/ui/global-toast";
+import { listarCategorias } from "./queries";
 
 export default async function CategoriasPage() {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("categorias")
-    .select("categoria_id, nome")
-    .order("nome", { ascending: true });
-
-  const categorias = ((data ?? []) as CategoriaRow[]).map(mapearCategoria);
+  const { data: categorias, error } = await listarCategorias();
 
   return (
     <main className="flex flex-1 flex-col gap-6 p-6">
@@ -18,11 +11,9 @@ export default async function CategoriasPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Categorias</h1>
       </div>
 
-      {error ? (
-        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-          Não foi possível carregar as categorias: {error.message}
-        </div>
-      ) : categorias.length === 0 ? (
+      <GlobalToast message={error} type="error" />
+
+      {error ? null : categorias.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
           Nenhuma categoria encontrada.
         </div>

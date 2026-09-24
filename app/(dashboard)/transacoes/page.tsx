@@ -1,33 +1,15 @@
-import { createClient } from "@/lib/supabase/server";
+import { GlobalToast } from "@/components/ui/global-toast";
+import { listarTransacoes } from "./queries";
 import { TransacaoList } from "@/components/transacoes/transacao-list";
-import {
-  mapearTransacao,
-  type TransacaoRow,
-} from "@/types/transacao";
 
 type TransacoesPageProps = {
   searchParams: Promise<{ tipo?: string }>;
 };
 
-export default async function TransacoesPage({
-  searchParams,
-}: TransacoesPageProps) {
+export default async function TransacoesPage({ searchParams }: TransacoesPageProps) {
   const { tipo } = await searchParams;
   const filtro = tipo === "receita" || tipo === "despesa" ? tipo : undefined;
-  const supabase = await createClient();
-
-  let query = supabase
-    .from("transacoes")
-    .select("*")
-    .order("data_cadastro", { ascending: false });
-
-  if (filtro) {
-    const tipoBanco = filtro === "receita" ? 1 : 2;
-    query = query.eq("tipo_transacao", tipoBanco);
-  }
-
-  const { data, error } = await query;
-  const transacoes = ((data ?? []) as TransacaoRow[]).map(mapearTransacao);
+  const { data: transacoes, error } = await listarTransacoes(filtro);
   const titulo = filtro
     ? filtro === "receita"
       ? "Receitas"
@@ -41,9 +23,11 @@ export default async function TransacoesPage({
         <h1 className="text-2xl font-semibold tracking-tight">{titulo}</h1>
       </div>
 
-      {error ? (
-        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-          Não foi possível carregar as transações: {error.message}
+      <GlobalToast message={error} type="error" />
+
+      {error ? null : transacoes.length === 0 ? (
+        <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+          Nenhuma transação encontrada.
         </div>
       ) : (
         <TransacaoList transacoes={transacoes} />
