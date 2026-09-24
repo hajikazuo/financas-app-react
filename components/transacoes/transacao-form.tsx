@@ -47,6 +47,7 @@ export function TransacaoForm({
 }: TransacaoFormProps) {
   const isEditando = Boolean(transacao);
   const [open, setOpen] = useState(false);
+  const [toastKey, setToastKey] = useState(0);
   const [state, formAction, isPending] = useActionState(
     async (previousState: CriarTransacaoState, formData: FormData) => {
       const nextState = isEditando
@@ -57,6 +58,8 @@ export function TransacaoForm({
         setOpen(false);
       }
 
+      setToastKey((value) => value + 1);
+
       return nextState;
     },
     initialState,
@@ -64,10 +67,17 @@ export function TransacaoForm({
 
   return (
     <>
-      <GlobalToast message={state.error} type="error" />
+      <GlobalToast message={state.error} type="error" toastKey={toastKey} />
       <GlobalToast
-        message={state.success ? "Transação cadastrada com sucesso." : null}
+        message={
+          state.success
+            ? isEditando
+              ? "Transação atualizada com sucesso."
+              : "Transação cadastrada com sucesso."
+            : null
+        }
         type="success"
+        toastKey={toastKey}
       />
 
       <Sheet open={open} onOpenChange={setOpen}>

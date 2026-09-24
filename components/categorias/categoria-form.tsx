@@ -31,6 +31,7 @@ const initialState: CriarCategoriaState = {
 export function CategoriaForm({ categoria }: { categoria?: Categoria }) {
   const isEditando = Boolean(categoria);
   const [open, setOpen] = useState(false);
+  const [toastKey, setToastKey] = useState(0);
   const [state, formAction, isPending] = useActionState(
     async (previousState: CriarCategoriaState, formData: FormData) => {
       const nextState = isEditando
@@ -41,6 +42,8 @@ export function CategoriaForm({ categoria }: { categoria?: Categoria }) {
         setOpen(false);
       }
 
+      setToastKey((value) => value + 1);
+
       return nextState;
     },
     initialState,
@@ -48,10 +51,17 @@ export function CategoriaForm({ categoria }: { categoria?: Categoria }) {
 
   return (
     <>
-      <GlobalToast message={state.error} type="error" />
+      <GlobalToast message={state.error} type="error" toastKey={toastKey} />
       <GlobalToast
-        message={state.success ? "Categoria cadastrada com sucesso." : null}
+        message={
+          state.success
+            ? isEditando
+              ? "Categoria atualizada com sucesso."
+              : "Categoria cadastrada com sucesso."
+            : null
+        }
         type="success"
+        toastKey={toastKey}
       />
 
       <Sheet open={open} onOpenChange={setOpen}>

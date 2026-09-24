@@ -6,9 +6,10 @@ import { toast } from "@/components/ui/toast";
 type GlobalToastProps = {
   message: string | null;
   type?: "error" | "success" | "info" | "warning";
+  toastKey?: string | number;
 };
 
-export function GlobalToast({ message, type = "info" }: GlobalToastProps) {
+export function GlobalToast({ message, type = "info", toastKey }: GlobalToastProps) {
   const lastToast = useRef<string | null>(null);
 
   useEffect(() => {
@@ -17,11 +18,11 @@ export function GlobalToast({ message, type = "info" }: GlobalToastProps) {
       return;
     }
 
-    const toastKey = `${type}:${message}`;
+    const currentToastKey = `${type}:${message}:${toastKey ?? ""}`;
 
-    if (lastToast.current === toastKey) return;
+    if (lastToast.current === currentToastKey) return;
 
-    lastToast.current = toastKey;
+    lastToast.current = currentToastKey;
 
     toast.add({
       id: "global-toast",
@@ -29,7 +30,7 @@ export function GlobalToast({ message, type = "info" }: GlobalToastProps) {
       description: message,
       priority: type === "error" ? "high" : "low",
     });
-  }, [message, type]);
+  }, [message, type, toastKey]);
 
   return null;
 }
