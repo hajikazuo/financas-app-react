@@ -50,7 +50,7 @@ export async function updateSession(request: NextRequest) {
         isAuthenticated &&
         (pathname === "/login" || pathname === "/cadastro")
     ) {
-        return NextResponse.redirect(new URL("/", request.url));
+        return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
     return supabaseResponse;
