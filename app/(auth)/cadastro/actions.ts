@@ -1,16 +1,23 @@
 "use server";
 
-import { redirect } from "next/navigation";
-
 import { createClient } from "@/lib/supabase/server";
 
 export type SignupState = {
   error: string | null;
+  success: string | null;
 };
 
 export async function signup(_previousState: SignupState, formData: FormData): Promise<SignupState> {
-  const email = String(formData.get("email"));
-  const password = String(formData.get("password"));
+  const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+  if (password !== confirmPassword) {
+    return {
+      error: "As senhas não coincidem.",
+      success: null,
+    };
+  }
 
   const supabase = await createClient();
 
@@ -24,8 +31,12 @@ export async function signup(_previousState: SignupState, formData: FormData): P
 
     return {
       error: "Não foi possível criar a conta. Verifique os dados informados.",
+      success: null,
     };
   }
 
-  redirect("/login?message=account-created");
+  return {
+    error: null,
+    success: "Conta criada! Agora você já pode entrar.",
+  };
 }
