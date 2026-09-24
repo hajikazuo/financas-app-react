@@ -1,4 +1,5 @@
 import { GlobalToast } from "@/components/ui/global-toast";
+import { CategoriaForm } from "@/components/categorias/categoria-form";
 import { listarCategorias } from "./queries";
 
 export default async function CategoriasPage() {
@@ -11,7 +12,10 @@ export default async function CategoriasPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Categorias</h1>
       </div>
 
-      <GlobalToast message={error} type="error" />
+      <div className="flex items-center justify-between gap-4">
+        <GlobalToast message={error} type="error" />
+        <CategoriaForm />
+      </div>
 
       {error ? null : categorias.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">

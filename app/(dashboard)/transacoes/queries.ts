@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { TransacaoList } from "@/components/transacoes/transacao-list";
 import {
     mapearTransacao,
     type TipoTransacao,
