@@ -19,9 +19,11 @@ import { Label } from "@/components/ui/label";
 import { cn } from "cn";
 import { criarTransacao, type CriarTransacaoState } from "@/app/(dashboard)/transacoes/actions";
 import type { Categoria } from "@/types/categoria";
+import type { TipoTransacao } from "@/types/transacao";
 
 type TransacaoFormProps = {
   categorias: Categoria[];
+  tipoInicial?: TipoTransacao;
 };
 
 const initialState: CriarTransacaoState = {
@@ -29,7 +31,7 @@ const initialState: CriarTransacaoState = {
   success: false,
 };
 
-export function TransacaoForm({ categorias }: TransacaoFormProps) {
+export function TransacaoForm({ categorias, tipoInicial = "despesa" }: TransacaoFormProps) {
   const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
     async (previousState: CriarTransacaoState, formData: FormData) => {
@@ -72,7 +74,7 @@ export function TransacaoForm({ categorias }: TransacaoFormProps) {
               <select
                 id="tipo"
                 name="tipo"
-                defaultValue="despesa"
+                defaultValue={tipoInicial}
                 required
                 className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground"
               >

@@ -25,6 +25,7 @@ export async function criarCategoria( _previousState: CriarCategoriaState, formD
   }
 
   const { error } = await supabase.from("categorias").insert({
+    usuario_id: user.id,
     nome
   });
 

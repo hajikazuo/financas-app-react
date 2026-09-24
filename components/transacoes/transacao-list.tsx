@@ -30,6 +30,7 @@ export function TransacaoList({ transacoes }: { transacoes: Transacao[] }) {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Categoria</TableHead>
             <TableHead>Descrição</TableHead>
             <TableHead>Tipo</TableHead>
             <TableHead>Data</TableHead>
@@ -42,7 +43,10 @@ export function TransacaoList({ transacoes }: { transacoes: Transacao[] }) {
 
             return (
               <TableRow key={transacao.transacaoId}>
-                <TableCell className="font-medium">
+                <TableCell>
+                  {transacao.categoriaNome}
+                </TableCell>
+                <TableCell>
                   {transacao.descricao}
                 </TableCell>
                 <TableCell>

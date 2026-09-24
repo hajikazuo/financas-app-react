@@ -32,7 +32,7 @@ export default async function TransacoesPage({ searchParams }: TransacoesPagePro
 
       <div className="flex items-center justify-between gap-4">
         <GlobalToast message={error ?? categoriasError} type="error" />
-        <TransacaoForm categorias={categorias} />
+        <TransacaoForm categorias={categorias} tipoInicial={filtro} />
       </div>
 
       {error ? null : transacoes.length === 0 ? (

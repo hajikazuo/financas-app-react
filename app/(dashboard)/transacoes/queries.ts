@@ -16,7 +16,18 @@ export async function listarTransacoes(filtro?: TipoTransacao): Promise<ListarTr
 
     let query = supabase
         .from("transacoes")
-        .select("*")
+        .select(`
+            transacao_id,
+            usuario_id,
+            categoria_id,
+            descricao,
+            valor,
+            data_cadastro,
+            tipo_transacao,
+            categoria:categorias!transacoes_categoria_id_fkey (
+              nome
+            )
+        `)
         .order("data_cadastro", { ascending: false });
 
     if (filtro) {
