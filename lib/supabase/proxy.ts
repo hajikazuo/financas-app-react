@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
     const isAuthenticated = Boolean(data?.claims?.sub);
     const pathname = request.nextUrl.pathname;
 
-    const publicRoutes = ["/login", "/cadastro", "/auth/confirm"];
+    const publicRoutes = ["/", "/login", "/cadastro"];
 
     const isPublicRoute = publicRoutes.some(
         (route) =>
