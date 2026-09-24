@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
+import { PasswordField } from "@/components/password-field";
 import { GlobalToast } from "@/components/ui/global-toast";
 import { Button } from "@/components/ui/button"
 import {
@@ -23,6 +24,7 @@ const initialState: LoginState = {
 
 export default function LoginPage() {
     const [state, formAction, isPending] = useActionState(login, initialState);
+    const [showPassword, setShowPassword] = useState(false);
 
     return (
         <>
@@ -54,12 +56,13 @@ export default function LoginPage() {
                                 required
                             />
                         </div>
-                        <div className="grid gap-2">
-                            <div className="flex items-center">
-                                <Label htmlFor="password">Senha</Label>
-                            </div>
-                            <Input id="password" name="password" type="password" required />
-                        </div>
+                        <PasswordField
+                            id="password"
+                            name="password"
+                            label="Senha"
+                            visible={showPassword}
+                            onToggle={() => setShowPassword((visible) => !visible)}
+                        />
                     </div>
 
                 </CardContent>
