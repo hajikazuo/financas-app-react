@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Plus } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 
 import { GlobalToast } from "@/components/ui/global-toast";
 import { Button } from "@/components/ui/button";
@@ -17,13 +17,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "cn";
-import { criarTransacao, type CriarTransacaoState } from "@/app/(dashboard)/transacoes/actions";
+import {
+  criarTransacao,
+  editarTransacao,
+  type CriarTransacaoState,
+} from "@/app/(dashboard)/transacoes/actions";
 import type { Categoria } from "@/types/categoria";
-import type { TipoTransacao } from "@/types/transacao";
+import type { TipoTransacao, Transacao } from "@/types/transacao";
 
 type TransacaoFormProps = {
   categorias: Categoria[];
   tipoInicial?: TipoTransacao;
+  transacao?: Transacao;
 };
 
 const initialState: CriarTransacaoState = {
@@ -31,11 +36,22 @@ const initialState: CriarTransacaoState = {
   success: false,
 };
 
-export function TransacaoForm({ categorias, tipoInicial = "despesa" }: TransacaoFormProps) {
+function formatarDataParaInput(data: string) {
+  return data.slice(0, 10);
+}
+
+export function TransacaoForm({
+  categorias,
+  tipoInicial = "despesa",
+  transacao,
+}: TransacaoFormProps) {
+  const isEditando = Boolean(transacao);
   const [open, setOpen] = useState(false);
   const [state, formAction, isPending] = useActionState(
     async (previousState: CriarTransacaoState, formData: FormData) => {
-      const nextState = await criarTransacao(previousState, formData);
+      const nextState = isEditando
+        ? await editarTransacao(previousState, formData)
+        : await criarTransacao(previousState, formData);
 
       if (nextState.success) {
         setOpen(false);
@@ -55,26 +71,41 @@ export function TransacaoForm({ categorias, tipoInicial = "despesa" }: Transacao
       />
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger render={<Button />}>
-          <Plus />
-          Nova transação
+        <SheetTrigger
+          render={
+            <Button
+              variant={isEditando ? "ghost" : "default"}
+              size={isEditando ? "icon" : "default"}
+              aria-label={isEditando ? "Editar transação" : undefined}
+              title={isEditando ? "Editar transação" : undefined}
+            />
+          }
+        >
+          {isEditando ? <Pencil /> : <Plus />}
+          {!isEditando && "Nova transação"}
         </SheetTrigger>
 
         <SheetContent side="right" className="overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>Nova transação</SheetTitle>
+            <SheetTitle>{isEditando ? "Editar transação" : "Nova transação"}</SheetTitle>
             <SheetDescription>
-              Preencha os dados para registrar uma receita ou despesa.
+              {isEditando
+                ? "Atualize os dados da receita ou despesa."
+                : "Preencha os dados para registrar uma receita ou despesa."}
             </SheetDescription>
           </SheetHeader>
 
           <form action={formAction} className="flex flex-1 flex-col gap-5 px-4">
+            {transacao && (
+              <input type="hidden" name="transacaoId" value={transacao.transacaoId} />
+            )}
+
             <div className="grid gap-2">
               <Label htmlFor="tipo">Tipo</Label>
               <select
                 id="tipo"
                 name="tipo"
-                defaultValue={tipoInicial}
+                defaultValue={transacao?.tipo ?? tipoInicial}
                 required
                 className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground"
               >
@@ -89,6 +120,7 @@ export function TransacaoForm({ categorias, tipoInicial = "despesa" }: Transacao
                 id="descricao"
                 name="descricao"
                 placeholder="Ex.: Mercado"
+                defaultValue={transacao?.descricao}
                 required
               />
             </div>
@@ -102,6 +134,7 @@ export function TransacaoForm({ categorias, tipoInicial = "despesa" }: Transacao
                 min="0.01"
                 step="0.01"
                 placeholder="0,00"
+                defaultValue={transacao?.valor}
                 required
               />
             </div>
@@ -111,7 +144,7 @@ export function TransacaoForm({ categorias, tipoInicial = "despesa" }: Transacao
               <select
                 id="categoriaId"
                 name="categoriaId"
-                defaultValue=""
+                defaultValue={transacao?.categoriaId ?? ""}
                 className={cn(
                   "h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 bg-background text-foreground [&>option]:bg-background [&>option]:text-foreground",
                   categorias.length === 0 && "text-muted-foreground",
@@ -132,14 +165,18 @@ export function TransacaoForm({ categorias, tipoInicial = "despesa" }: Transacao
                 id="dataCadastro"
                 name="dataCadastro"
                 type="date"
-                defaultValue={new Date().toISOString().slice(0, 10)}
+                defaultValue={
+                  transacao
+                    ? formatarDataParaInput(transacao.dataCadastro)
+                    : new Date().toISOString().slice(0, 10)
+                }
                 required
               />
             </div>
 
             <SheetFooter className="px-0">
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Salvando..." : "Salvar"}
+                {isPending ? "Salvando..." : isEditando ? "Atualizar" : "Salvar"}
               </Button>
             </SheetFooter>
           </form>

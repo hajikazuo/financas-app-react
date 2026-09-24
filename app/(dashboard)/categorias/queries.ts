@@ -11,7 +11,7 @@ export async function listarCategorias(): Promise<ListarCategoriasResult> {
 
   const { data, error } = await supabase
     .from("categorias")
-    .select("categoria_id, nome")
+    .select("categoria_id, usuario_id, nome")
     .order("nome", { ascending: true });
 
   if (error) {

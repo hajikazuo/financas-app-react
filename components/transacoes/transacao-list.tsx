@@ -1,5 +1,7 @@
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import type { Transacao } from "@/types/transacao";
+import type { Categoria } from "@/types/categoria";
+import { TransacaoForm } from "@/components/transacoes/transacao-form";
 import {
   Table,
   TableBody,
@@ -16,7 +18,13 @@ const currencyFormatter = new Intl.NumberFormat("pt-BR", {
 
 const dateFormatter = new Intl.DateTimeFormat("pt-BR");
 
-export function TransacaoList({ transacoes }: { transacoes: Transacao[] }) {
+export function TransacaoList({
+  transacoes,
+  categorias,
+}: {
+  transacoes: Transacao[];
+  categorias: Categoria[];
+}) {
   if (transacoes.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
@@ -35,6 +43,7 @@ export function TransacaoList({ transacoes }: { transacoes: Transacao[] }) {
             <TableHead>Tipo</TableHead>
             <TableHead>Data</TableHead>
             <TableHead className="text-right">Valor</TableHead>
+            <TableHead className="w-12 text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -74,6 +83,9 @@ export function TransacaoList({ transacoes }: { transacoes: Transacao[] }) {
                   }`}
                 >
                   {currencyFormatter.format(transacao.valor)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <TransacaoForm categorias={categorias} transacao={transacao} />
                 </TableCell>
               </TableRow>
             );

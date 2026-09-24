@@ -45,7 +45,7 @@ export default async function TransacoesPage({ searchParams }: TransacoesPagePro
           Nenhuma transação encontrada.
         </div>
       ) : (
-        <TransacaoList transacoes={transacoes} />
+        <TransacaoList transacoes={transacoes} categorias={categorias} />
       )}
     </main>
   );

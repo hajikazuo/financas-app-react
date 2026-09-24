@@ -33,7 +33,10 @@ export default async function CategoriasPage() {
               key={categoria.categoriaId}
               className="rounded-lg border bg-card p-4 font-medium"
             >
-              {categoria.nome}
+              <div className="flex items-center justify-between gap-3">
+                <span>{categoria.nome}</span>
+                {categoria.usuarioId && <CategoriaForm categoria={categoria} />}
+              </div>
             </div>
           ))}
         </div>
