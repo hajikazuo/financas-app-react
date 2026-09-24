@@ -1,11 +1,15 @@
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
+import { createClient } from "@/lib/supabase/server";
 import type { ReactNode } from "react";
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
     return (
         <SidebarProvider>
-            <AppSidebar />
+            <AppSidebar email={user?.email} />
 
             <SidebarInset className="flex min-h-svh flex-1 flex-col">
                 <header className="flex h-16 items-center gap-4 border-b px-4 md:px-6">

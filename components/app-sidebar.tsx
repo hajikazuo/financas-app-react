@@ -7,6 +7,7 @@ import {
   ArrowUpCircle,
   ArrowDownCircle,
   LogOut,
+  UserRound,
 } from "lucide-react"
 import { logout } from "@/app/(auth)/logout/actions"
 import {
@@ -50,7 +51,9 @@ const items = [
   },
 ]
 
-export function AppSidebar() {
+export function AppSidebar({ email }: { email?: string | null }) {
+  const inicial = email?.charAt(0).toUpperCase() ?? "U";
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -94,7 +97,18 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            {/* informações do usuário */}
+            <div className="flex items-center gap-3 rounded-lg px-2 py-2">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700">
+                {email ? inicial : <UserRound className="size-4" />}
+              </div>
+
+              <div className="min-w-0 flex-1 leading-tight">
+                <p className="text-xs font-medium text-muted-foreground">Usuário conectado</p>
+                <p className="truncate text-sm font-medium" title={email ?? "Usuário"}>
+                  {email ?? "Usuário"}
+                </p>
+              </div>
+            </div>
           </SidebarMenuItem>
 
           <SidebarMenuItem>

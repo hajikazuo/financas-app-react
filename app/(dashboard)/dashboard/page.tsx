@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardBreadcrumb } from "@/components/app-breadcrumb";
 import { listarTransacoesDoDashboard } from "./queries";
 import type { Transacao } from "@/types/transacao";
+import { TransacaoMonthFilter } from "@/components/transacoes/transacao-month-filter";
+import { mesValido, obterMesAtual } from "@/lib/mes";
 
 const moeda = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
 const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -35,9 +37,12 @@ function GraficoMensal({ atual, anterior }: { atual: number[]; anterior: number[
   return <div className="mt-6"><div className="flex h-64 items-end gap-2 border-b border-l px-2 pt-4 sm:gap-3">{meses.map((mes, index) => { const alturaAtual = Math.max((atual[index] / maiorValor) * 100, atual[index] ? 3 : 0); const alturaAnterior = Math.max((anterior[index] / maiorValor) * 100, anterior[index] ? 3 : 0); return <div key={mes} className="group flex h-full flex-1 items-end justify-center gap-0.5"><div className="relative flex h-full flex-1 items-end justify-end"><div className="w-full rounded-t-sm bg-primary/85 transition-all group-hover:bg-primary" style={{ height: `${alturaAtual}%` }} title={`${mes}: ${moeda.format(atual[index])}`} /></div><div className="relative flex h-full flex-1 items-end"><div className="w-full rounded-t-sm bg-muted-foreground/20 transition-all group-hover:bg-muted-foreground/35" style={{ height: `${alturaAnterior}%` }} title={`${mes} anterior: ${moeda.format(anterior[index])}`} /></div></div>; })}</div><div className="mt-2 flex justify-between pl-2 text-[10px] text-muted-foreground sm:text-xs">{meses.map((mes) => <span key={mes} className="flex-1 text-center">{mes}</span>)}</div></div>;
 }
 
-export default async function DashboardPage() {
-  const anoAtual = new Date().getFullYear();
-  const mesAtual = new Date().getMonth();
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ mes?: string }> }) {
+  const { mes: mesParam } = await searchParams;
+  const mesSelecionado = mesValido(mesParam) && mesParam ? mesParam : obterMesAtual();
+  const [anoSelecionado, numeroMesSelecionado] = mesSelecionado.split("-").map(Number);
+  const anoAtual = anoSelecionado;
+  const mesAtual = numeroMesSelecionado - 1;
   const [{ data: transacoes, error }, { data: transacoesAnteriores }] = await Promise.all([listarTransacoesDoDashboard(anoAtual), listarTransacoesDoDashboard(anoAtual - 1)]);
   const receitas = somar(transacoes, "receita");
   const despesas = somar(transacoes, "despesa");
@@ -55,7 +60,7 @@ export default async function DashboardPage() {
   const nomesMes = new Intl.DateTimeFormat("pt-BR", { month: "long" }).format(new Date(anoAtual, mesAtual, 1));
 
   return <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-6">
-    <div className="flex flex-wrap items-end justify-between gap-4"><div><DashboardBreadcrumb title="Visão geral" /><p className="mt-5 text-sm font-medium text-primary">Olá, vamos cuidar do seu dinheiro?</p><h1 className="mt-1 text-3xl font-semibold tracking-tight">Resumo financeiro</h1><p className="mt-1 text-sm text-muted-foreground">Acompanhe sua evolução em {anoAtual}.</p></div><div className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm text-muted-foreground shadow-sm"><CalendarDays className="size-4 text-primary" /><span className="capitalize">{nomesMes} de {anoAtual}</span></div></div>
+    <div className="flex flex-wrap items-end justify-between gap-4"><div><DashboardBreadcrumb title="Visão geral" /><p className="mt-5 text-sm font-medium text-primary">Olá, vamos cuidar do seu dinheiro?</p><h1 className="mt-1 text-3xl font-semibold tracking-tight">Resumo financeiro</h1><p className="mt-1 text-sm text-muted-foreground">Acompanhe sua evolução em {anoAtual}.</p></div><div className="flex items-center gap-2"><CalendarDays className="size-4 text-primary" /><TransacaoMonthFilter mes={mesSelecionado} /></div></div>
     {error ? <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error}</div> : null}
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><CardResumo titulo="Receitas no ano" valor={receitas} legenda="vs. ano anterior" icone={ArrowUpRight} classe="bg-emerald-500" variacao={comparar(receitas, receitasAnteriores)} /><CardResumo titulo="Despesas no ano" valor={despesas} legenda="vs. ano anterior" icone={ArrowDownRight} classe="bg-rose-500" variacao={comparar(despesas, despesasAnteriores)} /><CardResumo titulo="Saldo do mês" valor={saldo} legenda={`resultado de ${nomesMes}`} icone={Wallet} classe="bg-sky-500" /><CardResumo titulo="Taxa de economia" valor={economia} legenda="da receita do mês" icone={PiggyBank} classe="bg-violet-500" formato="percentual" /></div>
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.9fr)]"><Card><CardHeader className="flex flex-row items-start justify-between gap-4 border-b pb-4"><div><CardTitle>Despesas mensais</CardTitle><p className="mt-1 text-sm text-muted-foreground">Comparativo entre {anoAtual} e {anoAtual - 1}</p></div><div className="flex shrink-0 gap-3 text-xs text-muted-foreground"><span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-primary" />{anoAtual}</span><span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-muted-foreground/25" />{anoAtual - 1}</span></div></CardHeader><CardContent><GraficoMensal atual={agruparPorMes(transacoes, anoAtual, "despesa")} anterior={agruparPorMes(transacoesAnteriores, anoAtual - 1, "despesa")} /></CardContent></Card>
