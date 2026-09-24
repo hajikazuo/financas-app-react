@@ -7,7 +7,11 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
-export function DashboardBreadcrumb() {
+type DashboardBreadcrumbProps = {
+  title: string;
+};
+
+export function DashboardBreadcrumb({ title }: DashboardBreadcrumbProps) {
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -18,7 +22,7 @@ export function DashboardBreadcrumb() {
         <BreadcrumbSeparator />
 
         <BreadcrumbItem>
-          <BreadcrumbPage>Visão geral</BreadcrumbPage>
+          <BreadcrumbPage>{title}</BreadcrumbPage>
         </BreadcrumbItem>
       </BreadcrumbList>
     </Breadcrumb>

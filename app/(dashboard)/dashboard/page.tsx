@@ -11,10 +11,15 @@ import {
   PiggyBank,
   Wallet,
 } from "lucide-react"
+import { DashboardBreadcrumb } from "@/components/app-breadcrumb";
 
 export default async function Home() {
   return (
     <main className="p-6">
+      <div className="mb-4">
+        <DashboardBreadcrumb title="Visão geral" />
+      </div>
+
       <h1 className="mb-6 text-2xl font-bold">Finanças</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -1,4 +1,5 @@
 import { GlobalToast } from "@/components/ui/global-toast";
+import { DashboardBreadcrumb } from "@/components/app-breadcrumb";
 import { TransacaoForm } from "@/components/transacoes/transacao-form";
 import { listarCategorias } from "@/app/(dashboard)/categorias/queries";
 import { listarTransacoes } from "./queries";
@@ -25,6 +26,10 @@ export default async function TransacoesPage({ searchParams }: TransacoesPagePro
 
   return (
     <main className="flex flex-1 flex-col gap-6 p-6">
+      <div className="mb-4">
+        <DashboardBreadcrumb title={titulo} />
+      </div>
+
       <div>
         <p className="text-sm text-muted-foreground">Movimentações</p>
         <h1 className="text-2xl font-semibold tracking-tight">{titulo}</h1>
