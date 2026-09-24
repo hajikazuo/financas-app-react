@@ -149,3 +149,47 @@ export async function editarTransacao(
 
   return { error: null, success: true };
 }
+
+export async function deletarTransacao(
+  transacaoId: string,
+): Promise<CriarTransacaoState> {
+  const id = transacaoId.trim();
+
+  if (!id) {
+    return { error: "Não foi possível identificar a transação.", success: false };
+  }
+
+  const { supabase, user } = await obterUsuario();
+
+  if (!user) {
+    return { error: "Sua sessão expirou. Faça login novamente.", success: false };
+  }
+
+  const { data, error } = await supabase
+    .from("transacoes")
+    .delete()
+    .eq("transacao_id", id)
+    .eq("usuario_id", user.id)
+    .select("transacao_id")
+    .maybeSingle();
+
+  if (error) {
+    console.error("Erro ao deletar transação:", error);
+
+    return {
+      error: "Não foi possível excluir a transação. Tente novamente.",
+      success: false,
+    };
+  }
+
+  if (!data) {
+    return {
+      error: "Transação não encontrada ou sem permissão para excluí-la.",
+      success: false,
+    };
+  }
+
+  revalidatePath("/transacoes");
+
+  return { error: null, success: true };
+}

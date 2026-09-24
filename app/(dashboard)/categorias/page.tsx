@@ -2,6 +2,7 @@ import { GlobalToast } from "@/components/ui/global-toast";
 import { CategoriaForm } from "@/components/categorias/categoria-form";
 import { DashboardBreadcrumb } from "@/components/app-breadcrumb";
 import { listarCategorias } from "./queries";
+import { CategoriaDeleteButton } from "@/components/categorias/categoria-delete-button";
 
 export default async function CategoriasPage() {
   const { data: categorias, error } = await listarCategorias();
@@ -35,7 +36,13 @@ export default async function CategoriasPage() {
             >
               <div className="flex items-center justify-between gap-3">
                 <span>{categoria.nome}</span>
-                {categoria.usuarioId && <CategoriaForm categoria={categoria} />}
+
+                {categoria.usuarioId && (
+                  <div className="flex items-center gap-1">
+                    <CategoriaForm categoria={categoria} />
+                    <CategoriaDeleteButton categoriaId={categoria.categoriaId} />
+                  </div>
+                )}
               </div>
             </div>
           ))}

@@ -2,6 +2,7 @@ import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import type { Transacao } from "@/types/transacao";
 import type { Categoria } from "@/types/categoria";
 import { TransacaoForm } from "@/components/transacoes/transacao-form";
+import { TransacaoDeleteButton } from "@/components/transacoes/transacao-delete-button";
 import {
   Table,
   TableBody,
@@ -85,7 +86,10 @@ export function TransacaoList({
                   {currencyFormatter.format(transacao.valor)}
                 </TableCell>
                 <TableCell className="text-right">
-                  <TransacaoForm categorias={categorias} transacao={transacao} />
+                  <div className="flex justify-end gap-1">
+                    <TransacaoForm categorias={categorias} transacao={transacao} />
+                    <TransacaoDeleteButton transacaoId={transacao.transacaoId} />
+                  </div>
                 </TableCell>
               </TableRow>
             );
