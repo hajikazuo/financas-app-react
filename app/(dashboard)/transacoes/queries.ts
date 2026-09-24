@@ -5,13 +5,17 @@ import {
     type Transacao,
     type TransacaoRow,
 } from "@/types/transacao";
+import { obterIntervaloMes } from "@/lib/mes";
 
 type ListarTransacoesResult = {
     data: Transacao[];
     error: string | null;
 };
 
-export async function listarTransacoes(filtro?: TipoTransacao): Promise<ListarTransacoesResult> {
+export async function listarTransacoes(
+    filtro?: TipoTransacao,
+    mes?: string,
+): Promise<ListarTransacoesResult> {
     const supabase = await createClient();
 
     let query = supabase
@@ -33,6 +37,11 @@ export async function listarTransacoes(filtro?: TipoTransacao): Promise<ListarTr
     if (filtro) {
         const tipoBanco = filtro === "receita" ? 1 : 2;
         query = query.eq("tipo_transacao", tipoBanco);
+    }
+
+    if (mes) {
+        const { inicio, fim } = obterIntervaloMes(mes);
+        query = query.gte("data_cadastro", inicio).lt("data_cadastro", fim);
     }
 
     const { data, error } = await query;

@@ -4,16 +4,19 @@ import { TransacaoForm } from "@/components/transacoes/transacao-form";
 import { listarCategorias } from "@/app/(dashboard)/categorias/queries";
 import { listarTransacoes } from "./queries";
 import { TransacaoList } from "@/components/transacoes/transacao-list";
+import { TransacaoMonthFilter } from "@/components/transacoes/transacao-month-filter";
+import { mesValido, obterMesAtual } from "@/lib/mes";
 
 type TransacoesPageProps = {
-  searchParams: Promise<{ tipo?: string }>;
+  searchParams: Promise<{ tipo?: string; mes?: string }>;
 };
 
 export default async function TransacoesPage({ searchParams }: TransacoesPageProps) {
-  const { tipo } = await searchParams;
+  const { tipo, mes: mesParam } = await searchParams;
   const filtro = tipo === "receita" || tipo === "despesa" ? tipo : undefined;
+  const mes = mesValido(mesParam) && mesParam ? mesParam : obterMesAtual();
   const [transacoesResult, categoriasResult] = await Promise.all([
-    listarTransacoes(filtro),
+    listarTransacoes(filtro, mes),
     listarCategorias(),
   ]);
   const { data: transacoes, error } = transacoesResult;
@@ -35,8 +38,9 @@ export default async function TransacoesPage({ searchParams }: TransacoesPagePro
         <h1 className="text-2xl font-semibold tracking-tight">{titulo}</h1>
       </div>
 
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <GlobalToast message={error ?? categoriasError} type="error" />
+        <TransacaoMonthFilter mes={mes} />
         <TransacaoForm categorias={categorias} tipoInicial={filtro} />
       </div>
 
