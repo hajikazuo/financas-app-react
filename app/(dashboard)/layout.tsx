@@ -19,7 +19,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
                     {children}
                 </main>
                 <footer className="border-t px-5 py-4 text-center text-xs text-muted-foreground md:px-7">
-                    Desenvolvido por Nilton Kazuo - {new Date().getFullYear()}
+                    Desenvolvido por{" "}
+                    <a href="https://www.linkedin.com/in/nilton-kazuo/" target="_blank" rel="noopener noreferrer" className="hover:underline">
+                        Nilton Kazuo
+                    </a>
+                    {" - "}
+                    {new Date().getFullYear()}
                 </footer>
             </SidebarInset>
         </SidebarProvider>
