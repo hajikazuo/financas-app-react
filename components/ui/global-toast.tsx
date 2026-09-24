@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useToastManager } from "@/components/ui/toast";
+import { useEffect, useRef } from "react";
+import { toast } from "@/components/ui/toast";
 
 type GlobalToastProps = {
   message: string | null;
@@ -9,18 +9,27 @@ type GlobalToastProps = {
 };
 
 export function GlobalToast({ message, type = "info" }: GlobalToastProps) {
-  const toastManager = useToastManager();
+  const lastToast = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!message) return;
+    if (!message) {
+      lastToast.current = null;
+      return;
+    }
 
-    toastManager.add({
+    const toastKey = `${type}:${message}`;
+
+    if (lastToast.current === toastKey) return;
+
+    lastToast.current = toastKey;
+
+    toast.add({
       id: "global-toast",
       type,
       description: message,
       priority: type === "error" ? "high" : "low",
     });
-  }, [message, toastManager, type]);
+  }, [message, type]);
 
   return null;
 }

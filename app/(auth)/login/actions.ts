@@ -5,7 +5,11 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
-export async function login(formData: FormData) {
+export type LoginState = {
+  error: string | null;
+};
+
+export async function login(_previousState: LoginState, formData: FormData): Promise<LoginState> {
   const email = String(formData.get("email"));
   const password = String(formData.get("password"));
 
@@ -17,9 +21,11 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    redirect(
-      `/login?error=${encodeURIComponent(error.message)}`,
-    );
+    console.error("Erro ao fazer login:", error);
+
+    return {
+      error: "Não foi possível entrar. Verifique seu e-mail e sua senha.",
+    };
   }
 
   revalidatePath("/", "layout");

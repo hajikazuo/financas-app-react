@@ -4,7 +4,11 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
-export async function signup(formData: FormData) {
+export type SignupState = {
+  error: string | null;
+};
+
+export async function signup(_previousState: SignupState, formData: FormData): Promise<SignupState> {
   const email = String(formData.get("email"));
   const password = String(formData.get("password"));
 
@@ -16,9 +20,11 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-    redirect(
-      `/cadastro?error=${encodeURIComponent(error.message)}`,
-    );
+    console.error("Erro ao criar conta:", error);
+
+    return {
+      error: "Não foi possível criar a conta. Verifique os dados informados.",
+    };
   }
 
   redirect("/login?message=account-created");

@@ -1,5 +1,8 @@
+"use client";
+
+import { useActionState } from "react";
 import Link from "next/link";
-import { login } from "./actions";
+import { GlobalToast } from "@/components/ui/global-toast";
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -12,10 +15,19 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { login, type LoginState } from "./actions";
+
+const initialState: LoginState = {
+    error: null,
+};
 
 export default function LoginPage() {
+    const [state, formAction, isPending] = useActionState(login, initialState);
+
     return (
-        <form action={login}>
+        <>
+            <GlobalToast message={state.error} type="error" />
+            <form action={formAction}>
             <Card className="w-full max-w-sm">
                 <CardHeader>
                     <CardTitle>Login</CardTitle>
@@ -52,11 +64,12 @@ export default function LoginPage() {
 
                 </CardContent>
                 <CardFooter className="flex-col gap-2">
-                    <Button type="submit" className="w-full">
-                        Login
+                    <Button type="submit" className="w-full" disabled={isPending}>
+                        {isPending ? "Entrando..." : "Login"}
                     </Button>
                 </CardFooter>
             </Card>
-        </form>
+            </form>
+        </>
     );
 }

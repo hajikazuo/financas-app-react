@@ -1,5 +1,8 @@
+"use client";
+
+import { useActionState } from "react";
 import Link from "next/link";
-import { signup } from "./actions";
+import { GlobalToast } from "@/components/ui/global-toast";
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,10 +14,19 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { signup, type SignupState } from "./actions";
+
+const initialState: SignupState = {
+  error: null,
+};
 
 export default function CadastroPage() {
+  const [state, formAction, isPending] = useActionState(signup, initialState);
+
   return (
-    <form action={signup}>
+    <>
+      <GlobalToast message={state.error} type="error" />
+      <form action={formAction}>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Criar conta</CardTitle>
@@ -46,11 +58,12 @@ export default function CadastroPage() {
         </CardContent>
         <CardFooter className="flex-col gap-2">
           <Button type="submit" className="w-full">
-            Cadastrar
+            {isPending ? "Cadastrando..." : "Cadastrar"}
           </Button>
         </CardFooter>
       </Card>
-    </form>
+      </form>
+    </>
   );
 }
 
